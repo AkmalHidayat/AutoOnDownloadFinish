@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoOnDownloadFinish</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles/main.css" />
+</head>
+<body>
+  <!-- Ambient background glow elements for Glassmorphism -->
+  <div class="ambient-canvas">
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+    <div class="ambient-orb orb-3"></div>
+  </div>
+
+  <div id="app">
+    <!-- Windows 11 Native Custom Title Bar (Clean Minimal) -->
+    <header id="titlebar" class="titlebar">
+      <div class="titlebar-brand">
+        <div class="logo-badge">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M12 3v12m0 0l-4-4m4 4l4-4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="brand-title">AODF</span>
+        <span class="brand-subtitle">AutoOnDownloadFinish</span>
+      </div>
+
+      <!-- Windows Native Window Controls (Right-aligned) -->
+      <div class="titlebar-window-actions">
+        <button class="win-btn win-min" id="btn-minimize" title="Minimize">
+          <svg width="10" height="1" viewBox="0 0 10 1"><path d="M0 0.5H10" stroke="currentColor" stroke-width="1.2"/></svg>
+        </button>
+        <button class="win-btn win-max" id="btn-maximize" title="Maximize">
+          <svg width="10" height="10" viewBox="0 0 10 10"><rect x="0.5" y="0.5" width="9" height="9" stroke="currentColor" fill="none" stroke-width="1"/></svg>
+        </button>
+        <button class="win-btn win-close" id="btn-close" title="Close">
+          <svg width="10" height="10" viewBox="0 0 10 10"><path d="M1 1L9 9M9 1L1 9" stroke="currentColor" stroke-width="1.2"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="app-layout">
+      <!-- Sleek Glass Sidebar -->
+      <nav id="sidebar" class="sidebar">
+        <div class="sidebar-top">
+          <div class="sidebar-nav">
+            <button class="nav-item active" data-page="dashboard" id="nav-dashboard">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="3" width="7" height="7" rx="2" stroke="currentColor" stroke-width="2"/>
+                <rect x="14" y="3" width="7" height="11" rx="2" stroke="currentColor" stroke-width="2"/>
+                <rect x="3" y="14" width="7" height="7" rx="2" stroke="currentColor" stroke-width="2"/>
+                <rect x="14" y="18" width="7" height="3" rx="1.5" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              <span data-i18n="nav_dashboard">Dashboard</span>
+            </button>
+            <button class="nav-item" data-page="settings" id="nav-settings">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 2v2m0 16v2M2 12h2m16 0h2m-3.5-6.5l-1.5 1.5m-10 10l-1.5 1.5m0-13l1.5 1.5m10 10l1.5 1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <span data-i18n="nav_settings">Settings</span>
+            </button>
+            <button class="nav-item" data-page="logs" id="nav-logs">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M4 6h16M4 12h11M4 18h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <span data-i18n="nav_activity">Aktivitas</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="sidebar-bottom">
+          <div class="sidebar-status-card">
+            <div class="status-pulse-wrapper">
+              <span class="status-radar-ping"></span>
+              <span class="status-dot" id="status-dot"></span>
+            </div>
+            <div class="status-info">
+              <span class="status-label" data-i18n="status_title">Status Monitor</span>
+              <span class="status-val" id="status-text">Idle</span>
+            </div>
+          </div>
+
+          <!-- Made by NexttarSan Credit -->
+          <div class="sidebar-credit">
+            <span class="credit-text">Made by</span>
+            <span class="credit-author">NexttarSan</span>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Glass Content Area -->
+      <main class="content">
+        <!-- ================= DASHBOARD PAGE (BENTO GRID) ================= -->
+        <div id="page-dashboard" class="page active">
+          <!-- Bento Grid Container -->
+          <div class="bento-grid">
+            
+            <!-- Bento 1: Hero Download Throughput (Span 5) -->
+            <div class="bento-card bento-hero-download">
+              <div class="bento-header">
+                <div class="bento-badge download-badge">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 4v12m0 0l-4-4m4 4l4-4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span data-i18n="card_download_label">KECEPATAN DOWNLOAD</span>
+                </div>
+                <div class="chip" id="interface-pill">
+                  <span class="chip-dot"></span>
+                  <span id="interface-name">All Adapters</span>
+                </div>
+              </div>
+
+              <div class="bento-speed-body">
+                <div class="speed-main-display">
+                  <span class="speed-number font-mono" id="download-speed">0.00</span>
+                  <span class="speed-unit-label" id="download-unit">MB/s</span>
+                </div>
+                <div class="speed-sub-conversion">
+                  <span class="conversion-tag" id="download-conversion">≈ 0.00 Mbps</span>
+                  <span class="peak-label" id="download-peak-label">Peak: 0.00 MB/s</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bento 2: Upload Speed (Span 4) -->
+            <div class="bento-card bento-upload">
+              <div class="bento-header">
+                <div class="bento-badge upload-badge">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 20V8m0 0l-4 4m4-4l4 4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span data-i18n="card_upload_label">KECEPATAN UPLOAD</span>
+                </div>
+              </div>
+
+              <div class="bento-speed-body">
+                <div class="speed-main-display">
+                  <span class="speed-number font-mono" id="upload-speed">0.00</span>
+                  <span class="speed-unit-label" id="upload-unit">MB/s</span>
+                </div>
+                <div class="speed-sub-conversion">
+                  <span class="conversion-tag" id="upload-conversion">≈ 0.00 Mbps</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bento 3: Data Terunduh Sesi Ini (Span 3) -->
+            <div class="bento-card bento-session-stats">
+              <div class="bento-header">
+                <div class="bento-badge session-badge">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                    <polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                  <span data-i18n="card_session_label">TOTAL DATA SESI</span>
+                </div>
+              </div>
+
+              <div class="bento-speed-body">
+                <div class="speed-main-display">
+                  <span class="speed-number font-mono" id="session-downloaded-val">0.0 MB</span>
+                </div>
+                <div class="speed-sub-conversion">
+                  <span class="conversion-tag" id="session-timer-val">Durasi: 00:00:00</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bento 4: Live Chart (Span 8) -->
+            <div class="bento-card bento-chart-wide">
+              <div class="bento-header">
+                <div class="bento-title-group">
+                  <span class="bento-card-title" data-i18n="chart_title">Aktivitas Jaringan Realtime (60 Detik)</span>
+                </div>
+                <div class="chart-legend-glass">
+                  <span class="legend-chip legend-dl">
+                    <span class="legend-glow-dot dl-dot"></span> Download
+                  </span>
+                  <span class="legend-chip legend-ul">
+                    <span class="legend-glow-dot ul-dot"></span> Upload
+                  </span>
+                </div>
+              </div>
+
+              <div class="canvas-container">
+                <canvas id="speed-chart" width="700" height="200"></canvas>
+              </div>
+
+              <div class="chart-timeline-footer">
+                <span data-i18n="chart_ago_60">60s lalu</span>
+                <span data-i18n="chart_ago_30">30s lalu</span>
+                <span data-i18n="chart_now">Sekarang</span>
+              </div>
+            </div>
+
+            <!-- Bento 5: Action & Threshold Mode (Span 4) with 4-Grid Clickable Buttons -->
+            <div class="bento-card bento-action-summary">
+              <div class="bento-header">
+                <div class="bento-badge action-badge-header">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 3v9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                  <span data-i18n="card_action_label">AKSI SELESAI</span>
+                </div>
+              </div>
+
+              <div class="action-card-content">
+                <!-- 4 Clickable Action Buttons (2x2 Grid) directly on Dashboard -->
+                <div class="dash-action-grid" id="dash-action-grid">
+                  <button class="dash-action-btn active" data-action="shutdown" id="dash-act-shutdown" title="Shutdown - Matikan PC">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                      <path d="M12 3v9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <span class="dash-action-label" data-i18n="act_shutdown">Shutdown</span>
+                  </button>
+                  <button class="dash-action-btn" data-action="restart" id="dash-act-restart" title="Restart - Mulai Ulang PC">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                      <path d="M4 12a8 8 0 0114-5.3V4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                      <path d="M20 12a8 8 0 01-14 5.3V20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                      <polyline points="14,4 18,4 18,8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <polyline points="10,20 6,20 6,16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="dash-action-label" data-i18n="act_restart">Restart</span>
+                  </button>
+                  <button class="dash-action-btn" data-action="sleep" id="dash-act-sleep" title="Sleep - Mode Tidur">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                      <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <span class="dash-action-label" data-i18n="act_sleep">Sleep</span>
+                  </button>
+                  <button class="dash-action-btn" data-action="hibernate" id="dash-act-hibernate" title="Hibernate - Simpan ke Disk">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                      <rect x="3" y="6" width="18" height="12" rx="2" stroke="currentColor" stroke-width="2"/>
+                      <path d="M7 10h4M7 14h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <span class="dash-action-label" data-i18n="act_hibernate">Hibernate</span>
+                  </button>
+                </div>
+                
+                <div class="condition-items">
+                  <div class="condition-row">
+                    <span class="cond-label" data-i18n="cond_threshold">Batas Kecepatan</span>
+                    <span class="cond-val font-mono" id="threshold-display">&lt; 0.62 MB/s</span>
+                  </div>
+                  <div class="condition-row">
+                    <span class="cond-label" data-i18n="cond_confirm">Durasi Konfirmasi</span>
+                    <span class="cond-val" id="confirm-duration">10 Detik</span>
+                  </div>
+                  <div class="condition-row">
+                    <span class="cond-label" data-i18n="cond_countdown">Waktu Mundur</span>
+                    <span class="cond-val" id="countdown-display">30 Detik</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bento 6: Control Dock Bar (Span 12) -->
+            <div class="bento-card bento-dock-bar">
+              <div class="dock-left">
+                <button class="btn btn-hero-glow" id="btn-toggle-monitor">
+                  <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
+                    <polygon points="4,2 14,8 4,14" fill="currentColor"/>
+                  </svg>
+                  <span id="btn-toggle-text" data-i18n="btn_start_monitor">Mulai Pantau</span>
+                </button>
+              </div>
+              <div class="dock-right">
+                <div class="dock-indicator-box">
+                  <span class="dock-indicator-text" id="dock-helper-text" data-i18n="dock_helper_idle">Tekan Mulai Pantau saat download berjalan</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ================= SETTINGS PAGE ================= -->
+        <div id="page-settings" class="page">
+          <div class="page-top-header">
+            <h1 class="page-main-title" data-i18n="settings_title">Pengaturan Aplikasi</h1>
+            <p class="page-sub-title" data-i18n="settings_subtitle">Konfigurasi ambang batas kecepatan, tindakan daya, dan preferensi sistem</p>
+          </div>
+
+          <div class="settings-bento-grid">
+            <!-- Settings Card 1: Preferensi Umum, Tema, Satuan & Bahasa -->
+            <div class="bento-card settings-panel">
+              <h3 class="settings-panel-title" data-i18n="sec_general">Preferensi Umum & Tampilan</h3>
+
+              <!-- Theme Selector -->
+              <div class="setting-item">
+                <label class="setting-label" for="setting-theme-select">
+                  <span data-i18n="opt_theme">Tema Tampilan (Theme)</span>
+                  <span class="setting-description" data-i18n="opt_theme_desc">Pilih gaya tema visual aplikasi</span>
+                </label>
+                <div class="setting-control">
+                  <select id="setting-theme-select" class="glass-select">
+                    <option value="system" data-i18n="opt_theme_system">Ikuti Sistem Windows (System Default)</option>
+                    <option value="dark" data-i18n="opt_theme_dark">Normal Dark (Obsidian Gradient Glow)</option>
+                    <option value="light" data-i18n="opt_theme_light">White (Light Frosted Gradient)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Language Selector -->
+              <div class="setting-item">
+                <label class="setting-label" for="setting-lang-select">
+                  <span data-i18n="opt_language">Bahasa Tampilan (Language)</span>
+                  <span class="setting-description" data-i18n="opt_language_desc">Pilih bahasa untuk antarmuka pengguna</span>
+                </label>
+                <div class="setting-control">
+                  <select id="setting-lang-select" class="glass-select">
+                    <option value="en" selected>English (US)</option>
+                    <option value="id">Bahasa Indonesia (ID)</option>
+                    <option value="ja">日本語 (Japanese)</option>
+                    <option value="zh">简体中文 (Chinese)</option>
+                    <option value="es">Español (Spanish)</option>
+                    <option value="ru">Русский (Russian)</option>
+                    <option value="de">Deutsch (German)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Speed Unit Selector -->
+              <div class="setting-item">
+                <label class="setting-label" for="setting-unit-select">
+                  <span data-i18n="opt_unit">Satuan Kecepatan</span>
+                  <span class="setting-description" data-i18n="opt_unit_desc">Tampilan kecepatan download/upload</span>
+                </label>
+                <div class="setting-control">
+                  <select id="setting-unit-select" class="glass-select">
+                    <option value="Mbps">Mbps ( MegaBit )</option>
+                    <option value="MB/s">MB/s ( MegaByte )</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Performance & Resource Efficiency Selector -->
+              <div class="setting-item">
+                <label class="setting-label" for="setting-perf-select">
+                  <span data-i18n="opt_perf">Presisi & Efisiensi Daya (Resource Footprint)</span>
+                  <span class="setting-description" data-i18n="opt_perf_desc">Atur frekuensi pemindaian jaringan & penghematan CPU/RAM</span>
+                </label>
+                <div class="setting-control">
+                  <select id="setting-perf-select" class="glass-select">
+                    <option value="2000" data-i18n="opt_perf_eco">Eco Saver (Interval 2.0s - Sangat Ringan CPU/RAM)</option>
+                    <option value="1000" data-i18n="opt_perf_balanced">Seimbang / Balanced (Interval 1.0s - Rekomendasi)</option>
+                    <option value="500" data-i18n="opt_perf_high">Presisi Tinggi (Interval 0.5s - Kurva Sangat Halus)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Grace Period -->
+              <div class="setting-item">
+                <label class="setting-label" for="setting-grace">
+                  <span data-i18n="opt_grace">Jeda Waktu Awal (Grace Period)</span>
+                  <span class="setting-description" data-i18n="opt_grace_desc">Detik sebelum deteksi kecepatan aktif (waktu untuk mulai download)</span>
+                </label>
+                <div class="setting-control">
+                  <input type="range" id="setting-grace" class="glass-slider" min="0" max="120" step="5" value="0">
+                  <div class="setting-value-display">
+                    <input type="number" id="setting-grace-value" class="glass-number" min="0" max="120" step="5" value="0">
+                    <span class="setting-unit" data-i18n="unit_sec">detik</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Settings Card 2: Pemantauan Jaringan -->
+            <div class="bento-card settings-panel">
+              <h3 class="settings-panel-title" data-i18n="sec_monitoring">Kriteria Pemantauan Download</h3>
+              
+              <div class="setting-item">
+                <label class="setting-label" for="setting-interface">
+                  <span data-i18n="opt_adapter">Kartu Jaringan (Network Adapter)</span>
+                  <span class="setting-description" data-i18n="opt_adapter_desc">Pilih kartu jaringan yang ingin dipantau</span>
+                </label>
+                <div class="setting-control">
+                  <select id="setting-interface" class="glass-select">
+                    <option value="all">Semua Adapter Fisik (Auto Filter)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="setting-item">
+                <label class="setting-label" for="setting-threshold">
+                  <span data-i18n="opt_threshold">Ambang Batas Kecepatan Selesai</span>
+                  <span class="setting-description" data-i18n="opt_threshold_desc">Jika kecepatan drop di bawah angka ini = download dianggap selesai</span>
+                </label>
+                <div class="setting-control">
+                  <input type="range" id="setting-threshold" class="glass-slider" min="0.1" max="10" step="0.1" value="0.6">
+                  <div class="setting-value-display">
+                    <input type="number" id="setting-threshold-value" class="glass-number" min="0.1" max="10" step="0.1" value="0.6">
+                    <span class="setting-unit" id="setting-threshold-unit">MB/s</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="setting-item">
+                <label class="setting-label" for="setting-confirm">
+                  <span data-i18n="opt_confirm">Durasi Konfirmasi Selesai</span>
+                  <span class="setting-description" data-i18n="opt_confirm_desc">Lama waktu kecepatan di bawah batas sebelum memicu countdown</span>
+                </label>
+                <div class="setting-control">
+                  <input type="range" id="setting-confirm" class="glass-slider" min="5" max="60" step="1" value="10">
+                  <div class="setting-value-display">
+                    <input type="number" id="setting-confirm-value" class="glass-number" min="5" max="60" step="1" value="10">
+                    <span class="setting-unit" data-i18n="unit_sec">detik</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="setting-item">
+                <label class="setting-label" for="setting-countdown">
+                  <span data-i18n="opt_countdown">Durasi Waktu Mundur (Countdown)</span>
+                  <span class="setting-description" data-i18n="opt_countdown_desc">Jeda waktu sebelum aksi dieksekusi (kesempatan untuk membatalkan)</span>
+                </label>
+                <div class="setting-control">
+                  <input type="range" id="setting-countdown" class="glass-slider" min="10" max="300" step="5" value="30">
+                  <div class="setting-value-display">
+                    <input type="number" id="setting-countdown-value" class="glass-number" min="10" max="300" step="5" value="30">
+                    <span class="setting-unit" data-i18n="unit_sec">detik</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Settings Card 3: Pilihan Aksi Daya -->
+            <div class="bento-card settings-panel">
+              <h3 class="settings-panel-title" data-i18n="sec_action">Tindakan Daya Otomatis</h3>
+              
+              <div class="setting-item">
+                <label class="setting-label" data-i18n="opt_action_select">Pilih aksi saat download selesai</label>
+                <div class="action-bento-selector" id="action-selector">
+                  <button class="action-bento-btn active" data-action="shutdown" id="action-shutdown">
+                    <div class="action-btn-icon">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 3v9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                      </svg>
+                    </div>
+                    <span class="action-title" data-i18n="act_shutdown">Shutdown</span>
+                    <span class="action-desc" data-i18n="act_shutdown_desc">Matikan PC total</span>
+                  </button>
+
+                  <button class="action-bento-btn" data-action="restart" id="action-restart">
+                    <div class="action-btn-icon">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M4 12a8 8 0 0114-5.3V4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M20 12a8 8 0 01-14 5.3V20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <polyline points="14,4 18,4 18,8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <polyline points="10,20 6,20 6,16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                    <span class="action-title" data-i18n="act_restart">Restart</span>
+                    <span class="action-desc" data-i18n="act_restart_desc">Mulai ulang PC</span>
+                  </button>
+
+                  <button class="action-bento-btn" data-action="sleep" id="action-sleep">
+                    <div class="action-btn-icon">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                      </svg>
+                    </div>
+                    <span class="action-title" data-i18n="act_sleep">Sleep</span>
+                    <span class="action-desc" data-i18n="act_sleep_desc">Mode tidur hemat daya</span>
+                  </button>
+
+                  <button class="action-bento-btn" data-action="hibernate" id="action-hibernate">
+                    <div class="action-btn-icon">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <rect x="3" y="6" width="18" height="12" rx="2" stroke="currentColor" stroke-width="2"/>
+                        <path d="M7 10h4M7 14h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <circle cx="15" cy="12" r="2" stroke="currentColor" stroke-width="1.5"/>
+                      </svg>
+                    </div>
+                    <span class="action-title" data-i18n="act_hibernate">Hibernate</span>
+                    <span class="action-desc" data-i18n="act_hibernate_desc">Simpan sesi ke disk</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Settings Card 4: Notifikasi & Sistem -->
+            <div class="bento-card settings-panel">
+              <h3 class="settings-panel-title" data-i18n="sec_system">Notifikasi & Integrasi Windows</h3>
+              
+              <div class="setting-item setting-switch-row">
+                <div class="setting-switch-info">
+                  <span class="setting-switch-title" data-i18n="opt_sound">Suara Alarm Countdown</span>
+                  <span class="setting-description" data-i18n="opt_sound_desc">Bunyikan nada peringatan saat waktu mundur dimulai</span>
+                </div>
+                <label class="glass-switch">
+                  <input type="checkbox" id="setting-sound" checked>
+                  <span class="switch-slider"></span>
+                </label>
+              </div>
+
+              <div class="setting-item setting-switch-row">
+                <div class="setting-switch-info">
+                  <span class="setting-switch-title" data-i18n="opt_notif">Notifikasi Desktop Windows</span>
+                  <span class="setting-description" data-i18n="opt_notif_desc">Tampilkan pop-up notifikasi desktop saat download kelar</span>
+                </div>
+                <label class="glass-switch">
+                  <input type="checkbox" id="setting-notifications" checked>
+                  <span class="switch-slider"></span>
+                </label>
+              </div>
+
+              <div class="setting-item setting-switch-row">
+                <div class="setting-switch-info">
+                  <span class="setting-switch-title" data-i18n="opt_autostart">Jalankan Otomatis saat Windows Boot</span>
+                  <span class="setting-description" data-i18n="opt_autostart_desc">Buka aplikasi otomatis ke System Tray saat login Windows</span>
+                </div>
+                <label class="glass-switch">
+                  <input type="checkbox" id="setting-autostart">
+                  <span class="switch-slider"></span>
+                </label>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ================= ACTIVITY LOG PAGE ================= -->
+        <div id="page-logs" class="page">
+          <div class="page-top-header">
+            <div class="page-title-with-action">
+              <div>
+                <h1 class="page-main-title" data-i18n="log_title">Riwayat Aktivitas</h1>
+                <p class="page-sub-title" data-i18n="log_subtitle">Catatan peristiwa pemantauan dan pemicu daya</p>
+              </div>
+              <button class="btn btn-glass-secondary" id="btn-clear-logs">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M3 6h18m-2 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <span data-i18n="btn_clear_log">Bersihkan</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="bento-card log-container-card">
+            <div class="log-list" id="log-list">
+              <div class="log-empty">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                  <circle cx="20" cy="20" r="16" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+                  <path d="M14 20H26M14 15H22M14 25H19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.3"/>
+                </svg>
+                <p data-i18n="log_empty">Belum ada aktivitas tercatat</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Glassmorphism Countdown Modal -->
+    <div class="countdown-overlay" id="countdown-overlay">
+      <div class="countdown-glass-modal">
+        <div class="countdown-halo-glow"></div>
+        <div class="countdown-warning-icon">
+          <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
+            <circle cx="24" cy="24" r="20" stroke="url(#warnGrad)" stroke-width="3" fill="none"/>
+            <path d="M24 14V28" stroke="url(#warnGrad)" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="24" cy="34" r="2" fill="url(#warnGrad2)"/>
+            <defs>
+              <linearGradient id="warnGrad" x1="4" y1="4" x2="44" y2="44">
+                <stop stop-color="#f59e0b"/>
+                <stop offset="1" stop-color="#ef4444"/>
+              </linearGradient>
+              <linearGradient id="warnGrad2" x1="22" y1="32" x2="26" y2="36">
+                <stop stop-color="#f59e0b"/>
+                <stop offset="1" stop-color="#ef4444"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <h2 class="countdown-title" data-i18n="countdown_title">Download Selesai!</h2>
+        <p class="countdown-subtitle" id="countdown-action-text">Sistem akan dieksekusi</p>
+        <div class="countdown-timer font-mono" id="countdown-timer">30</div>
+        <div class="countdown-progress-track">
+          <div class="countdown-progress-bar" id="countdown-progress-bar"></div>
+        </div>
+        <button class="btn btn-danger btn-large-glow" id="btn-cancel-countdown">
+          <span data-i18n="btn_cancel_countdown">Batalkan Eksekusi</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./app.ts"></script>
+</body>
+</html>
