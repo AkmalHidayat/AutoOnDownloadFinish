@@ -7,18 +7,18 @@
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
-    "package": "electron-builder --win --config electron-builder.yml"
+    "package": "npm run build && electron-builder --win --config electron-builder.yml"
   },
   "author": "Akmal",
   "license": "MIT",
   "dependencies": {
-    "electron": "^42.1.0",
-    "electron-vite": "^5.0.0",
     "systeminformation": "^5.31.6"
   },
   "devDependencies": {
     "@types/node": "^25.8.0",
+    "electron": "^42.1.0",
     "electron-builder": "^26.8.1",
+    "electron-vite": "^5.0.0",
     "typescript": "^6.0.3"
   }
 }
